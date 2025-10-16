@@ -27,7 +27,7 @@ public class Optimizer {
 
         photoTree = new PhotoTree("Галерея");
 
-        loadPhotos(folder);
+        loadPhotos(folder, folder);
 
         while (true) {
             printMenu();
@@ -79,23 +79,24 @@ public class Optimizer {
         }
     }
 
-    private static void loadPhotos(File folder) {
-        File[] files = folder.listFiles();
-        if (files == null) return;
+    private static void loadPhotos(File folder, File rootFolder) {
+        if (folder == null || !folder.isDirectory()) return;
 
-        for (File file : files) {
-            if (file.isFile() && PhotoMetadata.isImageFile(file)) {
-                PhotoMetadata metadata = new PhotoMetadata(file);
-                photoTree.addPhoto("Все Фото", metadata);
+        for (File file : folder.listFiles()) {
+            if (file.isDirectory()) {
+                loadPhotos(file, rootFolder);
+            }
+            else if (PhotoMetadata.isImageFile(file)) {
+                PhotoMetadata photo = new PhotoMetadata(file);
+                photoTree.addPhoto(rootFolder.toPath().relativize(file.getParentFile().toPath()).toString().replace("\\", "/"), photo);
             }
         }
-        System.out.println("Загружено " + photoTree.getCountPhoto() + " фотографий.");
     }
 
     private static void reloadTree() {
         photoTree = new PhotoTree("Фото");
-        loadPhotos(new File(lastLoadedFolder));
-        photoTree.organizeByDate();
+        File rootFolder = new File(lastLoadedFolder);
+        loadPhotos(rootFolder, rootFolder);
     }
 
     private static void printMenu() {

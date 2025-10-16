@@ -139,7 +139,7 @@ public class PhotoTree {
         }
 
         if (depth == 0) {
-            System.out.println(indent + node.getName());
+            System.out.println(indent + node.getName() + " (" + root.getTotalPhotos() + " фото)");
         } else {
             System.out.println(indent + node.getName() + " (" + node.getTotalPhotos() + " фото)");
         }
